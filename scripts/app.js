@@ -8,7 +8,8 @@
 import { validateField, validateRecord, RECORD_FIELDS } from './validators.js';
 import { addRecord, updateRecord, deleteRecord, getRecords, getSettings, subscribe } from './state.js';
 import { compileRegex } from './search.js';
-import { renderRecords, recordText } from './ui.js';
+import { renderRecords, renderDashboard, recordText } from './ui.js';
+import { computeStats, capInfo, last7Days } from './stats.js';
 
 const form = document.getElementById('task-form');
 const formStatus = document.querySelector('[data-form-status]');
@@ -188,7 +189,8 @@ function sortRecords(records, value) {
   });
 }
 
-function refresh() {
+/** Re-render the records list. Runs on search, sort, and data changes. */
+function renderList() {
   const all = getRecords();
   const settings = getSettings();
   const { re } = currentRegex();
@@ -198,6 +200,24 @@ function refresh() {
   const sorted = sortRecords(filtered, sortSelect ? sortSelect.value : 'dueDate-asc');
 
   renderRecords(sorted, { re, unit: settings.unitDisplay, total: all.length, searching });
+}
+
+/** Re-render the dashboard. Runs only on data/settings changes (not on search),
+ *  so the cap live-region doesn't re-announce on every keystroke. */
+function renderStats() {
+  const all = getRecords();
+  const settings = getSettings();
+  renderDashboard({
+    stats: computeStats(all),
+    cap: capInfo(all, settings.weeklyCapHours),
+    days: last7Days(all),
+    unit: settings.unitDisplay,
+  });
+}
+
+function refresh() {
+  renderStats();
+  renderList();
 }
 
 /* ============================================================
@@ -233,9 +253,10 @@ function init() {
   form.addEventListener('submit', handleSubmit);
   form.addEventListener('reset', handleReset);
 
-  if (searchInput) searchInput.addEventListener('input', refresh);
-  if (caseToggle) caseToggle.addEventListener('change', refresh);
-  if (sortSelect) sortSelect.addEventListener('change', refresh);
+  // Search/sort only re-filter the list; they don't change stats.
+  if (searchInput) searchInput.addEventListener('input', renderList);
+  if (caseToggle) caseToggle.addEventListener('change', renderList);
+  if (sortSelect) sortSelect.addEventListener('change', renderList);
   if (recordsSection) recordsSection.addEventListener('click', handleRecordsClick);
 
   // Escape cancels an in-progress edit.

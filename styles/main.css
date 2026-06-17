@@ -182,19 +182,30 @@ main { padding-block: var(--space-5) var(--space-6); }
 .stat__value { font-size: 1.6rem; font-weight: 700; }
 
 .chart__title { font-size: 0.9rem; color: var(--text-muted); margin-block-end: var(--space-2); }
-.chart__bars {
+.chart__row {
   display: flex;
   align-items: flex-end;
   gap: var(--space-2);
-  min-block-size: 90px;
+  block-size: 110px;
+}
+.chart__col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  block-size: 100%;
+  gap: var(--space-1);
 }
 .chart__bar {
-  flex: 1;
+  inline-size: 100%;
+  max-inline-size: 36px;
   background: var(--accent);
   border-radius: 4px 4px 0 0;
   min-block-size: 4px;
-  transition: block-size 400ms ease;
+  transition: block-size 500ms ease;
 }
+.chart__label { font-size: 0.75rem; color: var(--text-muted); }
 
 /* ---------- Toolbar (search + sort) ---------- */
 .toolbar { display: flex; flex-direction: column; gap: var(--space-4); margin-block-end: var(--space-3); }

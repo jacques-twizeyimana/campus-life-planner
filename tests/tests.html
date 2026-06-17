@@ -27,6 +27,7 @@
   <script type="module">
     import { validateField, validateRecord, isRealDate, isValidRecordShape, patterns } from '../scripts/validators.js';
     import { compileRegex, highlight } from '../scripts/search.js';
+    import { computeStats, capInfo, last7Days, startOfWeek, toISODate } from '../scripts/stats.js';
 
     const results = document.getElementById('results');
     let passed = 0, failed = 0;
@@ -101,6 +102,31 @@
     eq('highlight wraps match', highlight('Study group', compileRegex('Study', 'i')), '<mark>Study</mark> group');
     eq('highlight escapes HTML', highlight('<b>x</b>', compileRegex('x', 'i')), '&lt;b&gt;<mark>x</mark>&lt;/b&gt;');
     eq('null regex returns escaped text', highlight('a & b', null), 'a &amp; b');
+
+    /* ---------- Stats + cap + chart ---------- */
+    group('stats.js: computeStats, capInfo, last7Days');
+    const now = new Date(2025, 8, 30, 12, 0, 0); // Tue 2025-09-30
+    const sRecs = [
+      { id: '1', title: 'A', dueDate: '2025-09-29', duration: 90, tag: 'Study' },
+      { id: '2', title: 'B', dueDate: '2025-09-30', duration: 120, tag: 'Study' },
+      { id: '3', title: 'C', dueDate: '2025-09-20', duration: 45, tag: 'Event' },
+    ];
+    const st = computeStats(sRecs);
+    eq('total records', st.total, 3);
+    eq('sum minutes', st.totalMinutes, 255);
+    eq('top tag', st.topTag, 'Study');
+    const cap = capInfo(sRecs, 4, now);
+    eq('cap used (this week)', cap.usedMinutes, 210);
+    eq('cap remaining', cap.remainingMinutes, 30);
+    assert('cap not over', cap.over === false);
+    const cap2 = capInfo(sRecs, 3, now);
+    assert('cap over when exceeded', cap2.over === true);
+    eq('cap overage', cap2.remainingMinutes, -30);
+    const days = last7Days(sRecs, now);
+    eq('7-day window length', days.length, 7);
+    eq('today bucket minutes', days[6].minutes, 120);
+    assert('older task excluded from 7-day', !days.some((d) => d.date === '2025-09-20'));
+    eq('week starts Monday', toISODate(startOfWeek(now)), '2025-09-29');
 
     /* ---------- Summary ---------- */
     const summary = document.getElementById('summary');

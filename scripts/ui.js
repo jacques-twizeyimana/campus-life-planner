@@ -11,7 +11,26 @@ const els = {
   cards: document.querySelector('[data-records-cards]'),
   empty: document.querySelector('[data-empty]'),
   count: document.querySelector('[data-results-count]'),
+  // dashboard
+  statTotal: document.querySelector('[data-stat-total]'),
+  statMinutes: document.querySelector('[data-stat-minutes]'),
+  statTop: document.querySelector('[data-stat-top]'),
+  capUsed: document.querySelector('[data-cap-used]'),
+  capTotal: document.querySelector('[data-cap-total]'),
+  capFill: document.querySelector('[data-cap-fill]'),
+  capMessage: document.querySelector('[data-cap-message]'),
+  chart: document.querySelector('[data-chart]'),
 };
+
+/** Round minutes to a compact "1h 30m" / "45m" string. */
+export function humanMinutes(min) {
+  const n = Math.round(Number(min) || 0);
+  const h = Math.floor(n / 60);
+  const m = n % 60;
+  if (h && m) return `${h}h ${m}m`;
+  if (h) return `${h}h`;
+  return `${m}m`;
+}
 
 /** Display a duration (stored in minutes) per the chosen unit. */
 export function formatDuration(min, unit = 'minutes') {
@@ -76,6 +95,60 @@ export function renderRecords(records, { re = null, unit = 'minutes', total = re
       els.count.textContent = `${records.length} of ${total} task${total === 1 ? '' : 's'} match.`;
     } else {
       els.count.textContent = `${total} task${total === 1 ? '' : 's'}.`;
+    }
+  }
+}
+
+/**
+ * Render the dashboard: core stats, weekly cap status, and 7-day chart.
+ * @param {object} data { stats, cap, days, unit }
+ */
+export function renderDashboard({ stats, cap, days, unit = 'minutes' }) {
+  if (els.statTotal) els.statTotal.textContent = String(stats.total);
+  if (els.statMinutes) els.statMinutes.textContent = formatDuration(stats.totalMinutes, unit);
+  if (els.statTop) els.statTop.textContent = stats.topTag;
+
+  // --- Weekly cap ---
+  if (els.capUsed) els.capUsed.textContent = humanMinutes(cap.usedMinutes);
+  if (els.capTotal) els.capTotal.textContent = cap.capMinutes ? humanMinutes(cap.capMinutes) : 'no cap';
+  if (els.capFill) {
+    els.capFill.style.inlineSize = `${cap.percent}%`;
+    els.capFill.classList.toggle('is-over', cap.over);
+  }
+  if (els.capMessage) {
+    let msg;
+    if (!cap.capMinutes) {
+      msg = 'No weekly cap set — add one in Settings.';
+    } else if (cap.over) {
+      msg = `Over by ${humanMinutes(-cap.remainingMinutes)} — ${humanMinutes(cap.usedMinutes)} planned vs ${humanMinutes(cap.capMinutes)} cap.`;
+    } else if (cap.usedMinutes === 0) {
+      msg = `Nothing planned this week yet. ${humanMinutes(cap.capMinutes)} available.`;
+    } else {
+      msg = `${humanMinutes(cap.remainingMinutes)} of ${humanMinutes(cap.capMinutes)} remaining this week.`;
+    }
+    // Assertive when exceeded, polite otherwise (per spec).
+    els.capMessage.setAttribute('aria-live', cap.over ? 'assertive' : 'polite');
+    els.capMessage.textContent = msg;
+  }
+
+  // --- 7-day chart ---
+  if (els.chart) {
+    const max = Math.max(1, ...days.map((d) => d.minutes));
+    const anyData = days.some((d) => d.minutes > 0);
+    if (!anyData) {
+      els.chart.innerHTML = '<p class="muted">Chart appears once you add tasks with due dates in the last 7 days.</p>';
+    } else {
+      const bars = days
+        .map((d) => {
+          const pct = Math.round((d.minutes / max) * 100);
+          return `<div class="chart__col" aria-hidden="true">
+            <div class="chart__bar" style="block-size:${pct}%"></div>
+            <span class="chart__label">${escapeHtml(d.label)}</span>
+          </div>`;
+        })
+        .join('');
+      const summary = days.map((d) => `${d.label} ${d.minutes} minutes`).join(', ');
+      els.chart.innerHTML = `<div class="chart__row">${bars}</div><p class="visually-hidden">Minutes planned per day: ${escapeHtml(summary)}.</p>`;
     }
   }
 }
