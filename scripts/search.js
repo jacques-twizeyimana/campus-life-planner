@@ -1,10 +1,7 @@
-/* ============================================================
-   search.js — safe regex compilation + accessible highlighting.
-   Pure functions, no DOM. UI wiring happens in app.js (M4).
-   ============================================================ */
+// Safe regex compilation + accessible highlighting. Pure functions, no DOM.
 
 /**
- * Compile a user-supplied pattern without ever throwing.
+ * Compile a user-supplied pattern without throwing.
  * @returns {RegExp|null} null for empty input or invalid syntax.
  */
 export function compileRegex(input, flags = 'i') {

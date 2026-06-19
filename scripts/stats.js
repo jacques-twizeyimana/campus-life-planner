@@ -1,7 +1,4 @@
-/* ============================================================
-   stats.js — pure dashboard calculations. No DOM.
-   Reused by ui.renderDashboard() and (potentially) tests.
-   ============================================================ */
+// Pure dashboard calculations. No DOM. Reused by ui.renderDashboard() and tests.
 
 /** Format a Date as a local YYYY-MM-DD string. */
 export function toISODate(d) {

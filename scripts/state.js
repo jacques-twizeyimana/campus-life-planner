@@ -1,8 +1,6 @@
-/* ============================================================
-   state.js — single source of truth for records + settings.
-   Owns CRUD, id generation, persistence, and change notifications.
-   Views subscribe(); they never write localStorage directly.
-   ============================================================ */
+// Single source of truth for records and settings: CRUD, id generation,
+// persistence, and change notifications. Views subscribe(); they never write
+// localStorage directly.
 
 import { loadData, saveData, loadSettings, saveSettings } from './storage.js';
 
@@ -88,7 +86,7 @@ export function deleteRecord(id) {
   return records.length !== before;
 }
 
-/** Replace the entire dataset (used by JSON import in M6). */
+/** Replace the entire dataset (used by JSON import). */
 export function replaceAll(newRecords) {
   records = newRecords.map((r) => ({ ...r }));
   persist();
