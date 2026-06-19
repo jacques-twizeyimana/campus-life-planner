@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Campus Life Planner — Tests</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; color: #1a1d23; }
+    h1 { font-size: 1.4rem; }
+    .summary { font-weight: 700; padding: .5rem .75rem; border-radius: 8px; margin: 1rem 0; }
+    .summary.ok { background: #e7f6ec; color: #15803d; }
+    .summary.fail { background: #fdecec; color: #b91c1c; }
+    ul { list-style: none; padding: 0; }
+    li { padding: .35rem .5rem; border-bottom: 1px solid #eee; font-family: ui-monospace, monospace; font-size: .9rem; }
+    .pass::before { content: "✔ "; color: #15803d; }
+    .fail-line { color: #b91c1c; }
+    .fail-line::before { content: "\2718 "; color: #b91c1c; }
+    .group { margin-top: 1.5rem; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <h1>Campus Life Planner — unit tests</h1>
+  <p>Assertions for <code>validators.js</code> and <code>search.js</code>. Open this file in a browser.</p>
+  <div id="summary" class="summary">Running…</div>
+  <ul id="results"></ul>
+
+  <script type="module">
+    import { validateField, validateRecord, isRealDate, isValidRecordShape, patterns } from '../scripts/validators.js';
+    import { compileRegex, highlight } from '../scripts/search.js';
+
+    const results = document.getElementById('results');
+    let passed = 0, failed = 0;
+
+    function group(name) {
+      const li = document.createElement('li');
+      li.className = 'group';
+      li.textContent = name;
+      results.appendChild(li);
+    }
+    function assert(label, cond) {
+      const li = document.createElement('li');
+      li.className = cond ? 'pass' : 'fail-line';
+      li.textContent = label;
+      results.appendChild(li);
+      cond ? passed++ : failed++;
+    }
+    const eq = (label, a, b) => assert(`${label} (got ${JSON.stringify(a)})`, a === b);
+
+    /* ---------- Title ---------- */
+    group('Title rule: /^\\S(?:.*\\S)?$/ + duplicate-word back-reference');
+    eq('valid title passes', validateField('title', 'Calculus problem set'), '');
+    assert('leading space rejected', validateField('title', ' Calculus') !== '');
+    assert('trailing space rejected', validateField('title', 'Calculus ') !== '');
+    assert('empty rejected', validateField('title', '') !== '');
+    assert('duplicate word "the the" caught', validateField('title', 'review the the notes') !== '');
+    eq('single-char title ok', validateField('title', 'A'), '');
+
+    /* ---------- Duration ---------- */
+    group('Duration rule: /^(0|[1-9]\\d*)(\\.\\d{1,2})?$/');
+    eq('integer ok', validateField('duration', '90'), '');
+    eq('two decimals ok', validateField('duration', '45.50'), '');
+    assert('three decimals rejected', validateField('duration', '45.123') !== '');
+    assert('leading zero rejected', validateField('duration', '012') !== '');
+    assert('negative rejected', validateField('duration', '-5') !== '');
+    eq('zero ok', validateField('duration', '0'), '');
+
+    /* ---------- Date ---------- */
+    group('Date rule: YYYY-MM-DD + real-calendar check');
+    eq('valid date passes', validateField('dueDate', '2025-09-29'), '');
+    assert('bad format rejected', validateField('dueDate', '2025-9-1') !== '');
+    assert('month 13 rejected', validateField('dueDate', '2025-13-01') !== '');
+    assert('Feb 30 rejected (real-date check)', validateField('dueDate', '2025-02-30') !== '');
+    assert('isRealDate true for leap day', isRealDate('2024-02-29') === true);
+    assert('isRealDate false for non-leap', isRealDate('2025-02-29') === false);
+
+    /* ---------- Tag ---------- */
+    group('Tag rule: /^[A-Za-z]+(?:[ -][A-Za-z]+)*$/');
+    eq('single word ok', validateField('tag', 'Study'), '');
+    eq('hyphenated ok', validateField('tag', 'Group-Work'), '');
+    eq('spaced ok', validateField('tag', 'Lab Session'), '');
+    assert('digits rejected', validateField('tag', 'Study1') !== '');
+    assert('double space rejected', validateField('tag', 'Lab  Session') !== '');
+
+    /* ---------- Whole record + shape ---------- */
+    group('validateRecord + isValidRecordShape');
+    const good = { title: 'Lab report', dueDate: '2025-10-01', duration: '120', tag: 'Study', notes: '' };
+    assert('good record valid', validateRecord(good).valid === true);
+    const bad = { title: ' bad ', dueDate: '2025-02-30', duration: 'x', tag: '1', notes: 'is is wrong' };
+    const badResult = validateRecord(bad);
+    assert('bad record invalid', badResult.valid === false);
+    eq('bad record error count', Object.keys(badResult.errors).length, 5);
+    assert('valid shape accepted', isValidRecordShape({ id: 'task_0001', title: 'X', dueDate: '2025-01-01', duration: 30, tag: 'Study' }) === true);
+    assert('missing field rejected', isValidRecordShape({ id: 'task_0001', title: 'X' }) === false);
+    assert('string duration rejected by shape', isValidRecordShape({ id: 'a', title: 'X', dueDate: '2025-01-01', duration: '30', tag: 'Study' }) === false);
+
+    /* ---------- Search compiler + highlight ---------- */
+    group('search.js: safe compileRegex + highlight');
+    assert('valid pattern compiles', compileRegex('Stud', 'i') instanceof RegExp);
+    eq('invalid pattern returns null', compileRegex('(', 'i'), null);
+    eq('empty pattern returns null', compileRegex('', 'i'), null);
+    eq('highlight wraps match', highlight('Study group', compileRegex('Study', 'i')), '<mark>Study</mark> group');
+    eq('highlight escapes HTML', highlight('<b>x</b>', compileRegex('x', 'i')), '&lt;b&gt;<mark>x</mark>&lt;/b&gt;');
+    eq('null regex returns escaped text', highlight('a & b', null), 'a &amp; b');
+
+    /* ---------- Summary ---------- */
+    const summary = document.getElementById('summary');
+    summary.textContent = `${passed} passed, ${failed} failed`;
+    summary.className = 'summary ' + (failed === 0 ? 'ok' : 'fail');
+  </script>
+</body>
+</html>
