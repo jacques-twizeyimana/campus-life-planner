@@ -1,0 +1,134 @@
+[
+  {
+    "id": "task_0001",
+    "title": "Calculus problem set 4",
+    "dueDate": "2026-06-16",
+    "duration": 90,
+    "tag": "Study",
+    "notes": "Chapters 3-4",
+    "done": false,
+    "createdAt": "2026-06-10T09:15:00.000Z",
+    "updatedAt": "2026-06-10T09:15:00.000Z"
+  },
+  {
+    "id": "task_0002",
+    "title": "Group lab report draft",
+    "dueDate": "2026-06-17",
+    "duration": 120,
+    "tag": "Group-Work",
+    "notes": "Meet at 14:30 in the library",
+    "done": false,
+    "createdAt": "2026-06-11T10:00:00.000Z",
+    "updatedAt": "2026-06-12T08:30:00.000Z"
+  },
+  {
+    "id": "task_0003",
+    "title": "History lecture",
+    "dueDate": "2026-06-15",
+    "duration": 50,
+    "tag": "Class",
+    "notes": "",
+    "done": true,
+    "createdAt": "2026-06-09T07:45:00.000Z",
+    "updatedAt": "2026-06-15T12:00:00.000Z"
+  },
+  {
+    "id": "task_0004",
+    "title": "Gym session",
+    "dueDate": "2026-06-18",
+    "duration": 45.5,
+    "tag": "Personal",
+    "notes": "Leg day",
+    "done": false,
+    "createdAt": "2026-06-12T18:20:00.000Z",
+    "updatedAt": "2026-06-12T18:20:00.000Z"
+  },
+  {
+    "id": "task_0005",
+    "title": "Hackathon kickoff",
+    "dueDate": "2026-06-19",
+    "duration": 480,
+    "tag": "Event",
+    "notes": "Bring laptop and charger",
+    "done": false,
+    "createdAt": "2026-06-13T14:00:00.000Z",
+    "updatedAt": "2026-06-13T14:00:00.000Z"
+  },
+  {
+    "id": "task_0006",
+    "title": "Read chapter on regular expressions",
+    "dueDate": "2026-06-20",
+    "duration": 30,
+    "tag": "Study",
+    "notes": "Focus on lookahead and back-references",
+    "done": false,
+    "createdAt": "2026-06-14T20:10:00.000Z",
+    "updatedAt": "2026-06-14T20:10:00.000Z"
+  },
+  {
+    "id": "task_0007",
+    "title": "Submit scholarship form",
+    "dueDate": "2026-06-21",
+    "duration": 15,
+    "tag": "Assignment",
+    "notes": "Deadline is strict",
+    "done": false,
+    "createdAt": "2026-06-15T11:30:00.000Z",
+    "updatedAt": "2026-06-15T11:30:00.000Z"
+  },
+  {
+    "id": "task_0008",
+    "title": "Leap-day planning session",
+    "dueDate": "2024-02-29",
+    "duration": 5,
+    "tag": "Personal",
+    "notes": "Edge-case date (leap year)",
+    "done": true,
+    "createdAt": "2024-02-29T06:00:00.000Z",
+    "updatedAt": "2024-02-29T06:00:00.000Z"
+  },
+  {
+    "id": "task_0009",
+    "title": "New Year reflection",
+    "dueDate": "2025-01-01",
+    "duration": 60,
+    "tag": "Personal",
+    "notes": "Year boundary",
+    "done": true,
+    "createdAt": "2025-01-01T08:00:00.000Z",
+    "updatedAt": "2025-01-01T08:00:00.000Z"
+  },
+  {
+    "id": "task_0010",
+    "title": "Year-end portfolio review",
+    "dueDate": "2025-12-31",
+    "duration": 240,
+    "tag": "Assignment",
+    "notes": "Largest single block",
+    "done": false,
+    "createdAt": "2025-12-20T13:00:00.000Z",
+    "updatedAt": "2025-12-20T13:00:00.000Z"
+  },
+  {
+    "id": "task_0011",
+    "title": "Chemistry lab session",
+    "dueDate": "2026-06-12",
+    "duration": 75,
+    "tag": "Lab Session",
+    "notes": "Goggles required",
+    "done": true,
+    "createdAt": "2026-06-08T15:45:00.000Z",
+    "updatedAt": "2026-06-12T16:30:00.000Z"
+  },
+  {
+    "id": "task_0012",
+    "title": "Study group sync 09:00",
+    "dueDate": "2026-06-13",
+    "duration": 25,
+    "tag": "Study",
+    "notes": "Time-token demo for regex search",
+    "done": false,
+    "createdAt": "2026-06-11T19:00:00.000Z",
+    "updatedAt": "2026-06-11T19:00:00.000Z"
+  }
+]

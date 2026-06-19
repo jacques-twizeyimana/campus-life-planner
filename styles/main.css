@@ -282,6 +282,8 @@ input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--
 .btn--danger { color: var(--danger); border-color: #f0c4c4; }
 .btn--danger:hover { background: var(--danger-weak); }
 .btn--file { cursor: pointer; }
+/* The file input is visually hidden but still focusable — show focus on the label. */
+.btn--file:focus-within { box-shadow: var(--ring); border-color: var(--accent); }
 
 /* ---------- Records: table + cards ---------- */
 .table-wrap { display: none; }            /* hidden on mobile, cards show instead */
