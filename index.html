@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Campus Life Planner — an accessible, responsive planner for student tasks and events." />
+  <title>Campus Life Planner</title>
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+  <!-- Skip link: first focusable element -->
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="brand" href="#main">
+        <span class="brand__mark" aria-hidden="true">◆</span>
+        <span class="brand__name">Campus Life Planner</span>
+      </a>
+      <nav class="site-nav" aria-label="Primary">
+        <ul class="site-nav__list">
+          <li><a href="#dashboard">Dashboard</a></li>
+          <li><a href="#records">Records</a></li>
+          <li><a href="#form-section">Add task</a></li>
+          <li><a href="#settings">Settings</a></li>
+          <li><a href="#about">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="container" tabindex="-1">
+
+    <!-- ===================== DASHBOARD ===================== -->
+    <section id="dashboard" class="section" aria-labelledby="dashboard-h">
+      <h1 id="dashboard-h" class="section__title">Dashboard</h1>
+
+      <!-- Weekly cap / target status (ARIA live in M5) -->
+      <div class="cap-card" aria-labelledby="cap-h">
+        <h2 id="cap-h" class="cap-card__title">This week</h2>
+        <p class="cap-card__figure"><span data-cap-used>0m</span> <span class="cap-card__sep">/</span> <span data-cap-total>10h</span> planned</p>
+        <div class="cap-bar" role="img" aria-label="Planned time against weekly cap">
+          <div class="cap-bar__fill" data-cap-fill style="inline-size: 0%"></div>
+        </div>
+        <p class="cap-card__note" data-cap-message role="status" aria-live="polite">No tasks yet.</p>
+      </div>
+
+      <ul class="stat-grid" aria-label="Summary statistics">
+        <li class="stat">
+          <span class="stat__label">Total tasks</span>
+          <span class="stat__value" data-stat-total>0</span>
+        </li>
+        <li class="stat">
+          <span class="stat__label">Total minutes</span>
+          <span class="stat__value" data-stat-minutes>0</span>
+        </li>
+        <li class="stat">
+          <span class="stat__label">Top tag</span>
+          <span class="stat__value" data-stat-top>—</span>
+        </li>
+      </ul>
+
+      <figure class="chart" aria-labelledby="chart-h">
+        <figcaption id="chart-h" class="chart__title">Last 7 days (minutes planned)</figcaption>
+        <div class="chart__bars" data-chart>
+          <!-- bars injected by JS in M5 -->
+          <p class="muted">Chart appears once you add tasks with due dates this week.</p>
+        </div>
+      </figure>
+    </section>
+
+    <!-- ===================== RECORDS ===================== -->
+    <section id="records" class="section" aria-labelledby="records-h">
+      <h2 id="records-h" class="section__title">Records</h2>
+
+      <div class="toolbar">
+        <div class="toolbar__search">
+          <label for="search">Search (regex)</label>
+          <input type="search" id="search" name="search" placeholder="e.g. \bStudy\b  or  @tag:Study" autocomplete="off" aria-describedby="search-help search-error" />
+          <p id="search-help" class="field-help">Type a pattern. Matches are highlighted.</p>
+          <p id="search-error" class="field-error" role="alert" hidden></p>
+        </div>
+        <div class="toolbar__controls">
+          <label class="checkbox">
+            <input type="checkbox" id="search-ci" checked />
+            <span>Ignore case</span>
+          </label>
+          <label for="sort">Sort by</label>
+          <select id="sort" name="sort">
+            <option value="dueDate-asc">Due date ↑</option>
+            <option value="dueDate-desc">Due date ↓</option>
+            <option value="title-asc">Title A→Z</option>
+            <option value="title-desc">Title Z→A</option>
+            <option value="duration-asc">Minutes ↑</option>
+            <option value="duration-desc">Minutes ↓</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="results-count" role="status" aria-live="polite" data-results-count></p>
+
+      <!-- Desktop: table -->
+      <div class="table-wrap" data-view="table">
+        <table class="records-table">
+          <caption class="visually-hidden">List of planned tasks and events</caption>
+          <thead>
+            <tr>
+              <th scope="col">Title</th>
+              <th scope="col">Due date</th>
+              <th scope="col">Minutes</th>
+              <th scope="col">Tag</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody data-records-body>
+            <!-- rows injected by JS (M4) -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mobile: cards -->
+      <ul class="cards" data-view="cards" data-records-cards aria-label="Planned tasks (card view)">
+        <!-- cards injected by JS (M4) -->
+      </ul>
+
+      <p class="empty-state" data-empty hidden>No tasks match. Try clearing the search or add a new task.</p>
+    </section>
+
+    <!-- ===================== ADD / EDIT FORM ===================== -->
+    <section id="form-section" class="section" aria-labelledby="form-h">
+      <h2 id="form-h" class="section__title">Add a task</h2>
+
+      <form id="task-form" class="task-form" novalidate>
+        <input type="hidden" name="id" />
+
+        <div class="field">
+          <label for="title">Title <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="title" name="title" required aria-describedby="title-error" autocomplete="off" />
+          <p id="title-error" class="field-error" role="alert" hidden></p>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="dueDate">Due date <span class="req" aria-hidden="true">*</span></label>
+            <input type="text" id="dueDate" name="dueDate" inputmode="numeric" placeholder="YYYY-MM-DD" required aria-describedby="dueDate-error" />
+            <p id="dueDate-error" class="field-error" role="alert" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="duration">Duration (minutes) <span class="req" aria-hidden="true">*</span></label>
+            <input type="text" id="duration" name="duration" inputmode="decimal" required aria-describedby="duration-error duration-hint" />
+            <p id="duration-hint" class="field-help" data-duration-hint></p>
+            <p id="duration-error" class="field-error" role="alert" hidden></p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="tag">Tag <span class="req" aria-hidden="true">*</span></label>
+          <input type="text" id="tag" name="tag" list="tag-list" required aria-describedby="tag-error" autocomplete="off" />
+          <datalist id="tag-list">
+            <option value="Study"></option>
+            <option value="Class"></option>
+            <option value="Assignment"></option>
+            <option value="Event"></option>
+            <option value="Personal"></option>
+          </datalist>
+          <p id="tag-error" class="field-error" role="alert" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="notes">Notes</label>
+          <textarea id="notes" name="notes" rows="2" aria-describedby="notes-error"></textarea>
+          <p id="notes-error" class="field-error" role="alert" hidden></p>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn--primary" data-submit-label>Add task</button>
+          <button type="reset" class="btn btn--ghost" data-cancel hidden>Cancel</button>
+        </div>
+        <p class="form-status" role="status" aria-live="polite" data-form-status></p>
+      </form>
+    </section>
+
+    <!-- ===================== SETTINGS ===================== -->
+    <section id="settings" class="section" aria-labelledby="settings-h">
+      <h2 id="settings-h" class="section__title">Settings</h2>
+
+      <div class="settings-grid">
+        <div class="field">
+          <label for="weekly-cap">Weekly cap (hours)</label>
+          <input type="text" id="weekly-cap" name="weekly-cap" inputmode="decimal" value="10" aria-describedby="weekly-cap-error" />
+          <p id="weekly-cap-error" class="field-error" role="alert" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="unit-display">Show duration as</label>
+          <select id="unit-display" name="unit-display">
+            <option value="minutes">Minutes</option>
+            <option value="hours">Hours</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="theme">Theme</label>
+          <select id="theme" name="theme">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="settings-data">
+        <h3 class="settings-data__title">Data</h3>
+        <div class="settings-data__actions">
+          <button type="button" class="btn" data-export>Export JSON</button>
+          <label class="btn btn--file">
+            Import JSON
+            <input type="file" id="import-file" accept="application/json,.json" hidden />
+          </label>
+          <button type="button" class="btn btn--danger" data-reset>Reset all data</button>
+        </div>
+        <p class="settings-data__status" role="status" aria-live="polite" data-data-status></p>
+      </div>
+    </section>
+
+    <!-- ===================== ABOUT ===================== -->
+    <section id="about" class="section" aria-labelledby="about-h">
+      <h2 id="about-h" class="section__title">About</h2>
+      <p>
+        Campus Life Planner helps students capture tasks and events with a due date,
+        an estimated duration, and a tag — then sort, search, and keep planned time
+        under a weekly cap. Built with vanilla HTML, CSS, and JavaScript. No frameworks.
+      </p>
+      <ul class="about-contact">
+        <!-- TODO(M7): replace GITHUB_USERNAME and Your Name with real values -->
+        <li><strong>Built by:</strong> Your Name</li>
+        <li><strong>GitHub:</strong> <a href="https://github.com/GITHUB_USERNAME">@GITHUB_USERNAME</a></li>
+        <li><strong>Email:</strong> <a href="mailto:sandbergjacques500@gmail.com">sandbergjacques500@gmail.com</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Campus Life Planner · Built by <span>Your Name</span> ·
+        <a href="https://github.com/GITHUB_USERNAME">GitHub</a> ·
+        <a href="mailto:sandbergjacques500@gmail.com">Email</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- JS modules wired up starting M3 -->
+</body>
+</html>
