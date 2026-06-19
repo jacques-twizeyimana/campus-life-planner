@@ -1,9 +1,4 @@
-/* ============================================================
-   app.js — wires the DOM to state + validators + rendering.
-   M3: Add form with live regex validation.
-   M4: render table/cards, sort, safe regex search + highlight,
-       inline edit, and confirm-delete.
-   ============================================================ */
+// Wires the DOM to state, validators, and rendering.
 
 import { validateField, validateRecord, isValidRecordShape, patterns, RECORD_FIELDS } from './validators.js';
 import { addRecord, updateRecord, deleteRecord, getRecords, getSettings, setSettings, replaceAll, subscribe } from './state.js';
@@ -36,9 +31,7 @@ const dataStatus = document.querySelector('[data-data-status]');
 
 let editingId = null; // null = add mode, else editing this record
 
-/* ============================================================
-   Inline error helpers (form)
-   ============================================================ */
+// --- Form: inline errors ---
 function setError(field, message) {
   const input = form.elements[field];
   const errorEl = document.getElementById(`${field}-error`);
@@ -58,9 +51,7 @@ function clearAllErrors() {
   RECORD_FIELDS.forEach((field) => setError(field, ''));
 }
 
-/* ============================================================
-   Duration → human hint (minutes ↔ hours)
-   ============================================================ */
+// --- Duration hint (minutes → "1h 30m") ---
 export function formatMinutes(min) {
   const n = Number(min);
   if (!Number.isFinite(n) || n <= 0) return '';
@@ -76,9 +67,7 @@ function updateDurationHint() {
   durationHint.textContent = formatMinutes(form.elements.duration.value);
 }
 
-/* ============================================================
-   Live, per-field validation
-   ============================================================ */
+// --- Live, per-field validation ---
 function wireLiveValidation() {
   RECORD_FIELDS.forEach((field) => {
     const input = form.elements[field];
@@ -93,9 +82,7 @@ function wireLiveValidation() {
   });
 }
 
-/* ============================================================
-   Add / edit submit
-   ============================================================ */
+// --- Add / edit submit ---
 function readForm() {
   return {
     title: form.elements.title.value,
@@ -168,9 +155,7 @@ function handleReset() {
   formStatus.textContent = '';
 }
 
-/* ============================================================
-   Records: search + sort + render
-   ============================================================ */
+// --- Records: search + sort + render ---
 function currentRegex() {
   const pattern = searchInput ? searchInput.value.trim() : '';
   if (!pattern) {
@@ -212,7 +197,7 @@ function renderList() {
   renderRecords(sorted, { re, unit: settings.unitDisplay, total: all.length, searching });
 }
 
-/** Re-render the dashboard. Runs only on data/settings changes (not on search),
+/** Re-render the dashboard. Runs on data/settings changes only — not on search —
  *  so the cap live-region doesn't re-announce on every keystroke. */
 function renderStats() {
   const all = getRecords();
@@ -230,9 +215,7 @@ function refresh() {
   renderList();
 }
 
-/* ============================================================
-   Edit / delete via event delegation
-   ============================================================ */
+// --- Edit / delete via event delegation ---
 function handleRecordsClick(event) {
   const btn = event.target.closest('[data-action]');
   if (!btn) return;
@@ -251,9 +234,7 @@ function handleRecordsClick(event) {
   }
 }
 
-/* ============================================================
-   Settings (weekly cap, units, theme)
-   ============================================================ */
+// --- Settings (weekly cap, units, theme) ---
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
 }
@@ -287,7 +268,7 @@ function setupSettings() {
         return;
       }
       setCapError('');
-      setSettings({ weeklyCapHours: Number(v) }); // notify -> dashboard re-renders cap
+      setSettings({ weeklyCapHours: Number(v) });
     });
   }
   if (unitSelect) unitSelect.addEventListener('change', () => setSettings({ unitDisplay: unitSelect.value }));
@@ -298,9 +279,7 @@ function setupSettings() {
   if (caseToggle) caseToggle.addEventListener('change', () => setSettings({ ignoreCase: caseToggle.checked }));
 }
 
-/* ============================================================
-   Import / export JSON (validated) + reset
-   ============================================================ */
+// --- Import / export JSON (validated) + reset ---
 function normalizeImported(r) {
   const now = new Date().toISOString();
   return {
@@ -359,7 +338,7 @@ function handleImport(event) {
       if (!result.ok) {
         if (dataStatus) dataStatus.textContent = `Import failed: ${result.error}`;
       } else {
-        replaceAll(result.records); // notify -> full re-render
+        replaceAll(result.records);
         if (dataStatus) dataStatus.textContent = `Imported ${result.records.length} task${result.records.length === 1 ? '' : 's'}.`;
       }
     } catch {
@@ -382,9 +361,7 @@ function handleResetData() {
   }
 }
 
-/* ============================================================
-   Init
-   ============================================================ */
+// --- Init ---
 function init() {
   if (!form) return;
   wireLiveValidation();
@@ -414,8 +391,8 @@ function init() {
     }
   });
 
-  subscribe(refresh); // re-render on any state change
-  refresh();          // initial paint
+  subscribe(refresh);
+  refresh();
 }
 
 init();
