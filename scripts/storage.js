@@ -1,7 +1,4 @@
-/* ============================================================
-   storage.js — localStorage read/write with safe JSON parsing.
-   Pure persistence layer; no DOM, no app logic.
-   ============================================================ */
+// localStorage read/write with safe JSON parsing. No DOM, no app logic.
 
 export const DATA_KEY = 'campusPlanner:data';
 export const SETTINGS_KEY = 'campusPlanner:settings';
@@ -14,8 +11,8 @@ export const DEFAULT_SETTINGS = {
 };
 
 /**
- * Load the records array. Returns [] on missing or malformed data
- * (never throws — a corrupt store should not break the app).
+ * Load the records array. Returns [] on missing or malformed data, so a
+ * corrupt store never breaks the app.
  */
 export function loadData() {
   try {

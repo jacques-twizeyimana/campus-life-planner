@@ -1,11 +1,9 @@
-/* ============================================================
-   validators.js — regex rules + record validation.
-   Pure functions, no DOM. Reused by the form and tests.html.
-   ============================================================ */
+// Regex rules + record validation. Pure functions, no DOM. Reused by the form
+// and tests.html.
 
 /**
- * Regex catalog (see README). Four field rules + one advanced
- * back-reference rule for duplicate words.
+ * Regex catalog (see README): four field rules plus one back-reference rule
+ * for duplicate words.
  */
 export const patterns = {
   // 1. Title: no leading/trailing whitespace, at least one non-space char.
@@ -85,7 +83,7 @@ export function validateRecord(values) {
   return { valid: Object.keys(errors).length === 0, errors };
 }
 
-/** Shape check used when importing JSON (M6). Validates one parsed record. */
+/** Shape check used when importing JSON. Validates one parsed record. */
 export function isValidRecordShape(rec) {
   if (!rec || typeof rec !== 'object') return false;
   const okStrings = ['id', 'title', 'dueDate', 'tag'].every((k) => typeof rec[k] === 'string' && rec[k].length);

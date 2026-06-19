@@ -1,7 +1,5 @@
-/* ============================================================
-   Campus Life Planner — base styles (M2)
-   Mobile-first. Tokens via custom properties. 3 breakpoints.
-   ============================================================ */
+/* Campus Life Planner — base styles.
+   Mobile-first. Tokens via custom properties. Three breakpoints. */
 
 /* ---------- Design tokens ---------- */
 :root {
@@ -337,9 +335,7 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; padding: 0 1
 .site-footer { border-block-start: 1px solid var(--border); background: var(--surface); padding-block: var(--space-4); }
 .site-footer p { color: var(--text-muted); font-size: 0.9rem; }
 
-/* ============================================================
-   Breakpoint 1 — Tablet (~768px)
-   ============================================================ */
+/* Breakpoint 1 — Tablet (~768px) */
 @media (min-width: 768px) {
   .site-header__inner { flex-direction: row; align-items: center; justify-content: space-between; }
   .stat-grid { grid-template-columns: repeat(3, 1fr); }
@@ -351,9 +347,7 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; padding: 0 1
   .toolbar__search { flex: 1; max-inline-size: 420px; }
 }
 
-/* ============================================================
-   Breakpoint 2 — Desktop (~1024px): table replaces cards
-   ============================================================ */
+/* Breakpoint 2 — Desktop (~1024px): table replaces cards */
 @media (min-width: 1024px) {
   .table-wrap { display: block; }
   .cards { display: none; }

@@ -1,8 +1,5 @@
-/* ============================================================
-   ui.js — pure rendering of records into the table + cards.
-   Receives already-filtered/sorted records from app.js.
-   Uses search.js highlight() so all user data is HTML-escaped.
-   ============================================================ */
+// Renders records into the table and cards. Receives already-filtered/sorted
+// records from app.js and uses search.js highlight() so all user data is escaped.
 
 import { highlight, escapeHtml } from './search.js';
 
@@ -126,7 +123,7 @@ export function renderDashboard({ stats, cap, days, unit = 'minutes' }) {
     } else {
       msg = `${humanMinutes(cap.remainingMinutes)} of ${humanMinutes(cap.capMinutes)} remaining this week.`;
     }
-    // Assertive when exceeded, polite otherwise (per spec).
+    // Assertive when exceeded, polite otherwise.
     els.capMessage.setAttribute('aria-live', cap.over ? 'assertive' : 'polite');
     els.capMessage.textContent = msg;
   }

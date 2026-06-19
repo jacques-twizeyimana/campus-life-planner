@@ -12,8 +12,6 @@ No frameworks, no build step, no backend.
 - **App (GitHub Pages):** https://jacques-twizeyimana.github.io/campus-life-planner/
 - **Repository:** https://github.com/jacques-twizeyimana/campus-life-planner
 
-> _If the repository is named differently, update the two links above so they resolve._
-
 ---
 
 ## Features
