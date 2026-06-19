@@ -157,7 +157,7 @@ main { padding-block: var(--space-5) var(--space-6); }
 
 /* ---------- Dashboard ---------- */
 .cap-card {
-  background: var(--accent-weak);
+  background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: var(--space-4);

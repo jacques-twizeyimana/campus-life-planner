@@ -1,11 +1,8 @@
 # Campus Life Planner
 
 An accessible, responsive, **vanilla HTML/CSS/JS** planner for student tasks and
-events. Capture each item with a title, due date, estimated duration, and tag — then
+events. Capture each item with a title, due date, estimated duration, tag and then
 sort, search with regular expressions, and keep your planned time under a weekly cap.
-No frameworks, no build step, no backend.
-
-> **Theme:** Campus Life Planner (tasks/events, durations, tags, search)
 
 ## Live demo
 
@@ -83,15 +80,15 @@ docs/                 # M1 spec, data model, a11y plan, wireframes
 
 ```jsonc
 {
-  "id": "task_0001",        // unique, auto-generated (task_NNNN)
+  "id": "task_0001", // unique, auto-generated (task_NNNN)
   "title": "Calculus problem set 4",
-  "dueDate": "2026-06-16",  // YYYY-MM-DD
-  "duration": 90,           // minutes
+  "dueDate": "2026-06-16", // YYYY-MM-DD
+  "duration": 90, // minutes
   "tag": "Study",
-  "notes": "Chapters 3-4",  // optional
+  "notes": "Chapters 3-4", // optional
   "done": false,
   "createdAt": "2026-06-10T09:15:00.000Z",
-  "updatedAt": "2026-06-10T09:15:00.000Z"
+  "updatedAt": "2026-06-10T09:15:00.000Z",
 }
 ```
 
@@ -104,25 +101,25 @@ Stored under `localStorage` key `campusPlanner:data`; settings under
 
 Four field-validation rules plus one **advanced** back-reference rule.
 
-| # | Field / use | Pattern | Valid | Rejected |
-|---|-------------|---------|-------|----------|
-| 1 | Title — no edge spaces | `/^\S(?:.*\S)?$/` | `Calculus pset` | `␣Calculus`, `Calculus␣` |
-| 2 | Duration — number, ≤2 dp | `/^(0\|[1-9]\d*)(\.\d{1,2})?$/` | `90`, `45.5` | `012`, `45.123`, `-5` |
-| 3 | Due date — YYYY-MM-DD | `/^\d{4}-(0[1-9]\|1[0-2])-(0[1-9]\|[12]\d\|3[01])$/` | `2026-06-16` | `2026-13-01`, `2026-6-1` |
-| 4 | Tag — letters/space/hyphen | `/^[A-Za-z]+(?:[ -][A-Za-z]+)*$/` | `Group-Work`, `Lab Session` | `Study1`, `Lab␣␣Session` |
-| 5 | **Advanced — duplicate word** (back-reference) | `/\b(\w+)\s+\1\b/i` | flags `the the` | `the cat` (no match) |
+| #   | Field / use                                    | Pattern                                              | Valid                       | Rejected                 |
+| --- | ---------------------------------------------- | ---------------------------------------------------- | --------------------------- | ------------------------ |
+| 1   | Title — no edge spaces                         | `/^\S(?:.*\S)?$/`                                    | `Calculus pset`             | `␣Calculus`, `Calculus␣` |
+| 2   | Duration — number, ≤2 dp                       | `/^(0\|[1-9]\d*)(\.\d{1,2})?$/`                      | `90`, `45.5`                | `012`, `45.123`, `-5`    |
+| 3   | Due date — YYYY-MM-DD                          | `/^\d{4}-(0[1-9]\|1[0-2])-(0[1-9]\|[12]\d\|3[01])$/` | `2026-06-16`                | `2026-13-01`, `2026-6-1` |
+| 4   | Tag — letters/space/hyphen                     | `/^[A-Za-z]+(?:[ -][A-Za-z]+)*$/`                    | `Group-Work`, `Lab Session` | `Study1`, `Lab␣␣Session` |
+| 5   | **Advanced — duplicate word** (back-reference) | `/\b(\w+)\s+\1\b/i`                                  | flags `the the`             | `the cat` (no match)     |
 
 The date rule is shape-validation; the app additionally rejects impossible calendar
 dates (e.g. `2026-02-30`) via `isRealDate()`.
 
 ### Search examples (type these into the Records search box)
 
-| Goal | Pattern |
-|------|---------|
-| Find all "Study" tasks | `\bStudy\b` |
+| Goal                        | Pattern           |
+| --------------------------- | ----------------- |
+| Find all "Study" tasks      | `\bStudy\b`       |
 | Find time tokens like 14:30 | `\b\d{2}:\d{2}\b` |
-| Catch a duplicated word | `\b(\w+)\s+\1\b` |
-| Tasks ending in "draft" | `draft$` |
+| Catch a duplicated word     | `\b(\w+)\s+\1\b`  |
+| Tasks ending in "draft"     | `draft$`          |
 
 Toggle **Ignore case** to switch the `i` flag. Invalid patterns are caught and reported
 inline instead of throwing; all tasks remain visible.
@@ -131,14 +128,14 @@ inline instead of throwing; all tasks remain visible.
 
 ## Keyboard map
 
-| Key | Action |
-|-----|--------|
-| `Tab` / `Shift`+`Tab` | Move between all interactive elements |
-| `Enter` (on "Skip to content") | Jump focus to the main content |
-| `Enter` | Submit the form / activate a button or link |
-| `Space` | Toggle a checkbox (e.g. Ignore case) |
-| `Esc` | Cancel an in-progress edit |
-| `Enter` / `Esc` (in delete dialog) | Confirm / cancel deletion |
+| Key                                | Action                                      |
+| ---------------------------------- | ------------------------------------------- |
+| `Tab` / `Shift`+`Tab`              | Move between all interactive elements       |
+| `Enter` (on "Skip to content")     | Jump focus to the main content              |
+| `Enter`                            | Submit the form / activate a button or link |
+| `Space`                            | Toggle a checkbox (e.g. Ignore case)        |
+| `Esc`                              | Cancel an in-progress edit                  |
+| `Enter` / `Esc` (in delete dialog) | Confirm / cancel deletion                   |
 
 The entire flow — add, search, sort, edit, delete, import/export, settings — is operable
 with the keyboard alone.
@@ -162,18 +159,8 @@ with the keyboard alone.
 
 ---
 
-## Tech & constraints
-
-Vanilla HTML, CSS, and JavaScript (ES modules). **No frameworks** (no Bootstrap, React,
-or jQuery). Data persists in `localStorage`; import/export uses validated JSON.
-
----
-
 ## Author
 
 **Jacques Twizeyimana**
-GitHub: [@jacques-twizeyimana](https://github.com/jacques-twizeyimana) ·
+GitHub: [Jacques Twizeyimana](https://github.com/jacques-twizeyimana) ·
 Email: sandbergjacques500@gmail.com
-
-Individual work — the GitHub account above is the sole contributor. AI assistance was
-used during development, as permitted by the assignment.
