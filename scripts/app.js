@@ -5,8 +5,8 @@
        inline edit, and confirm-delete.
    ============================================================ */
 
-import { validateField, validateRecord, RECORD_FIELDS } from './validators.js';
-import { addRecord, updateRecord, deleteRecord, getRecords, getSettings, subscribe } from './state.js';
+import { validateField, validateRecord, isValidRecordShape, patterns, RECORD_FIELDS } from './validators.js';
+import { addRecord, updateRecord, deleteRecord, getRecords, getSettings, setSettings, replaceAll, subscribe } from './state.js';
 import { compileRegex } from './search.js';
 import { renderRecords, renderDashboard, recordText } from './ui.js';
 import { computeStats, capInfo, last7Days } from './stats.js';
@@ -23,6 +23,16 @@ const searchError = document.getElementById('search-error');
 const caseToggle = document.getElementById('search-ci');
 const sortSelect = document.getElementById('sort');
 const recordsSection = document.getElementById('records');
+
+// Settings + data I/O
+const weeklyCapInput = document.getElementById('weekly-cap');
+const weeklyCapError = document.getElementById('weekly-cap-error');
+const unitSelect = document.getElementById('unit-display');
+const themeSelect = document.getElementById('theme');
+const exportBtn = document.querySelector('[data-export]');
+const importInput = document.getElementById('import-file');
+const resetBtn = document.querySelector('[data-reset]');
+const dataStatus = document.querySelector('[data-data-status]');
 
 let editingId = null; // null = add mode, else editing this record
 
@@ -242,6 +252,137 @@ function handleRecordsClick(event) {
 }
 
 /* ============================================================
+   Settings (weekly cap, units, theme)
+   ============================================================ */
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
+}
+
+function setCapError(message) {
+  if (!weeklyCapError) return;
+  if (message) {
+    weeklyCapInput.setAttribute('aria-invalid', 'true');
+    weeklyCapError.textContent = message;
+    weeklyCapError.hidden = false;
+  } else {
+    weeklyCapInput.removeAttribute('aria-invalid');
+    weeklyCapError.textContent = '';
+    weeklyCapError.hidden = true;
+  }
+}
+
+function setupSettings() {
+  const s = getSettings();
+  if (weeklyCapInput) weeklyCapInput.value = s.weeklyCapHours;
+  if (unitSelect) unitSelect.value = s.unitDisplay;
+  if (themeSelect) themeSelect.value = s.theme;
+  if (caseToggle) caseToggle.checked = s.ignoreCase;
+  applyTheme(s.theme);
+
+  if (weeklyCapInput) {
+    weeklyCapInput.addEventListener('input', () => {
+      const v = weeklyCapInput.value.trim();
+      if (!patterns.duration.test(v)) {
+        setCapError('Enter hours as a number (max 2 decimals), e.g. 10 or 7.5.');
+        return;
+      }
+      setCapError('');
+      setSettings({ weeklyCapHours: Number(v) }); // notify -> dashboard re-renders cap
+    });
+  }
+  if (unitSelect) unitSelect.addEventListener('change', () => setSettings({ unitDisplay: unitSelect.value }));
+  if (themeSelect) themeSelect.addEventListener('change', () => {
+    setSettings({ theme: themeSelect.value });
+    applyTheme(themeSelect.value);
+  });
+  if (caseToggle) caseToggle.addEventListener('change', () => setSettings({ ignoreCase: caseToggle.checked }));
+}
+
+/* ============================================================
+   Import / export JSON (validated) + reset
+   ============================================================ */
+function normalizeImported(r) {
+  const now = new Date().toISOString();
+  return {
+    id: r.id,
+    title: r.title,
+    dueDate: r.dueDate,
+    duration: Number(r.duration),
+    tag: r.tag,
+    notes: r.notes ?? '',
+    done: Boolean(r.done),
+    createdAt: r.createdAt || now,
+    updatedAt: r.updatedAt || now,
+  };
+}
+
+/** Validate a parsed import payload. Rejects the whole file on any bad record. */
+function validateImport(parsed) {
+  if (!Array.isArray(parsed)) return { ok: false, error: 'expected a JSON array of tasks.' };
+  const seen = new Set();
+  const records = [];
+  for (let i = 0; i < parsed.length; i++) {
+    if (!isValidRecordShape(parsed[i])) {
+      return { ok: false, error: `task #${i + 1} is invalid or missing required fields.` };
+    }
+    if (seen.has(parsed[i].id)) {
+      return { ok: false, error: `duplicate id "${parsed[i].id}" at task #${i + 1}.` };
+    }
+    seen.add(parsed[i].id);
+    records.push(normalizeImported(parsed[i]));
+  }
+  return { ok: true, records };
+}
+
+function handleExport() {
+  const records = getRecords();
+  const blob = new Blob([JSON.stringify(records, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `campus-planner-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  if (dataStatus) dataStatus.textContent = `Exported ${records.length} task${records.length === 1 ? '' : 's'}.`;
+}
+
+function handleImport(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      const result = validateImport(parsed);
+      if (!result.ok) {
+        if (dataStatus) dataStatus.textContent = `Import failed: ${result.error}`;
+      } else {
+        replaceAll(result.records); // notify -> full re-render
+        if (dataStatus) dataStatus.textContent = `Imported ${result.records.length} task${result.records.length === 1 ? '' : 's'}.`;
+      }
+    } catch {
+      if (dataStatus) dataStatus.textContent = 'Import failed: file is not valid JSON.';
+    }
+    importInput.value = ''; // allow re-importing the same file
+  };
+  reader.onerror = () => {
+    if (dataStatus) dataStatus.textContent = 'Import failed: could not read the file.';
+    importInput.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function handleResetData() {
+  if (window.confirm('Delete ALL tasks? This cannot be undone.')) {
+    replaceAll([]);
+    if (editingId) { form.reset(); enterAddMode(); }
+    if (dataStatus) dataStatus.textContent = 'All tasks deleted.';
+  }
+}
+
+/* ============================================================
    Init
    ============================================================ */
 function init() {
@@ -258,6 +399,11 @@ function init() {
   if (caseToggle) caseToggle.addEventListener('change', renderList);
   if (sortSelect) sortSelect.addEventListener('change', renderList);
   if (recordsSection) recordsSection.addEventListener('click', handleRecordsClick);
+
+  setupSettings();
+  if (exportBtn) exportBtn.addEventListener('click', handleExport);
+  if (importInput) importInput.addEventListener('change', handleImport);
+  if (resetBtn) resetBtn.addEventListener('click', handleResetData);
 
   // Escape cancels an in-progress edit.
   document.addEventListener('keydown', (e) => {

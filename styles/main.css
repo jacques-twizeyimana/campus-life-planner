@@ -34,6 +34,26 @@
   --container: 1080px;
 
   --font: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color-scheme: light;
+}
+
+/* ---------- Dark theme (persisted via Settings) ---------- */
+[data-theme="dark"] {
+  --bg: #13151a;
+  --surface: #1b1e26;
+  --surface-2: #242833;
+  --text: #e7e9ee;
+  --text-muted: #a7adbd;
+  --border: #2d3240;
+  --accent: #8b85f0;
+  --accent-strong: #aaa5f7;
+  --accent-weak: #23263a;
+  --success: #7bd99a;
+  --danger: #f0908f;
+  --danger-weak: #3a2323;
+  --mark: #5c4a00;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.35);
+  color-scheme: dark;
 }
 
 /* ---------- Reset-ish ---------- */
@@ -140,7 +160,7 @@ main { padding-block: var(--space-5) var(--space-6); }
 /* ---------- Dashboard ---------- */
 .cap-card {
   background: var(--accent-weak);
-  border: 1px solid #d9dcfb;
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: var(--space-4);
   margin-block-end: var(--space-4);
@@ -150,8 +170,8 @@ main { padding-block: var(--space-5) var(--space-6); }
 .cap-card__sep { color: var(--text-muted); font-weight: 400; }
 .cap-bar {
   block-size: 12px;
-  background: #fff;
-  border: 1px solid #d9dcfb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 999px;
   overflow: hidden;
 }
